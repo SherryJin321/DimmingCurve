@@ -1,0 +1,9 @@
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\bin\Debug\Dimming Curve.exe.config
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\bin\Debug\Dimming Curve.exe
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\bin\Debug\Dimming Curve.pdb
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\obj\Debug\Dimming Curve.csprojResolveAssemblyReference.cache
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\obj\Debug\Dimming_Curve.Form1.resources
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\obj\Debug\Dimming_Curve.Properties.Resources.resources
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\obj\Debug\Dimming Curve.csproj.GenerateResource.Cache
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\obj\Debug\Dimming Curve.exe
+D:\MyProjects\C#Projects\Dimming Curve\Dimming Curve\obj\Debug\Dimming Curve.pdb
