@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DrawDimmingCurve"
         xmlns:d3="http://research.microsoft.com/DynamicDataDisplay/1.0"
         mc:Ignorable="d"
-        Title="绘制调光曲线" Height="600" Width="1060" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" FontSize="16" Loaded="Window_Loaded">
+        Title="调光曲线配置软件" Height="600" Width="1060" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" FontSize="16" Loaded="Window_Loaded">
     <Window.Resources>
         <Style TargetType="DataGrid" x:Key="dataGridStyle">
             <!--网格线颜色-->
@@ -117,7 +117,7 @@
             <Button x:Name="AdjustCurve" Content="调整曲线" Width="130" Height="40" Background="{x:Null}" BorderThickness="0" Click="AdjustCurve_Click"  IsEnabled="False"/>
         </Border>
         <Border Width="130" Height="40" Margin="10,120,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Background="WhiteSmoke">
-            <Button x:Name="ImportData" Content="导入数据" Width="130" Height="40" Background="{x:Null}" BorderThickness="0" IsEnabled="True" Click="ImportData_Click"/>
+            <Button x:Name="ImportData" Content="导入数据" Width="130" Height="40" Background="{x:Null}" BorderThickness="0" IsEnabled="False" Click="ImportData_Click"/>
         </Border>
         <Border Width="130" Height="40" Margin="180,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Background="WhiteSmoke">
             <Button x:Name="GenerateCurve" Content="生成曲线" Width="130" Height="40" Background="{x:Null}" BorderThickness="0" Click="GenerateCurve_Click" IsEnabled="False"/>
@@ -127,8 +127,7 @@
         </Border>
 
 
-
-        <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" ItemsSource="{Binding}" Width="300" Height="350" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,180,0,0" LostFocus="myDataGrid_LostFocus" MouseUp="myDataGrid_MouseUp" >
+        <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" CanUserAddRows="False" IsEnabled="False" ItemsSource="{Binding}" Width="300" Height="350" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,180,0,0" LostFocus="myDataGrid_LostFocus" MouseUp="myDataGrid_MouseUp" >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="电流(A)" Binding="{Binding Current}" IsReadOnly="True" Width="70" />
                 <DataGridTextColumn Header="PWM值" Binding="{Binding PWM}" Width="100"/>
@@ -136,7 +135,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <d3:ChartPlotter x:Name="DimmingCurveChart" Grid.Column="1" Margin="0,0,20,0" Height="550" Width="700" VerticalAlignment="Top" HorizontalAlignment="Right" Visibility="Collapsed">
+        <d3:ChartPlotter x:Name="DimmingCurveChart" Grid.Column="1" Margin="0,0,20,0" Height="550" Width="700" VerticalAlignment="Top" HorizontalAlignment="Right" IsEnabled="False">
             <d3:ChartPlotter.VerticalAxis>
                 <d3:VerticalIntegerAxis />
             </d3:ChartPlotter.VerticalAxis>

@@ -106,21 +106,7 @@ namespace DrawDimmingCurve
             ExportArray.IsEnabled = true;
 
             GenerateMyDataGrid();
-            RemoveGraph();
-
-            //绘制调光曲线上下限
-            if(ConfigureParameters.IsWhiteOrNot==1)
-            {
-                DrawWhiteLightMinimum();
-                DrawWhiteLightMaximum();
-                DimmingCurveChartHeader.Content = "调光曲线图（白色光）";
-            }
-            if(ConfigureParameters.IsWhiteOrNot==2)
-            {
-                DrawNotWhiteLightMinimum();
-                DrawNotWhiteLightMaximum();
-                DimmingCurveChartHeader.Content = "调光曲线图（非白色光）";
-            }            
+            GenerateStandardGraph();
         }
 
         private void myDataGrid_LostFocus(object sender, RoutedEventArgs e)
@@ -186,14 +172,68 @@ namespace DrawDimmingCurve
             myDataGrid.ItemsSource = myDataTable.DefaultView;
         }
 
+        public void GenerateStandardGraph()
+        {
+            RemoveAllGraph();
+
+            //绘制调光曲线上下限
+            if (ConfigureParameters.IsWhiteOrNot == 1)
+            {
+                DrawWhiteLightMinimum();
+                DrawWhiteLightMaximum();
+                DimmingCurveChartHeader.Content = "调光曲线图（白色光）";
+            }
+            if (ConfigureParameters.IsWhiteOrNot == 2)
+            {
+                DrawNotWhiteLightMinimum();
+                DrawNotWhiteLightMaximum();
+                DimmingCurveChartHeader.Content = "调光曲线图（非白色光）";
+            }
+        }
+
+
         #endregion
 
         #region 绘制曲线
 
         private void GenerateCurve_Click(object sender, RoutedEventArgs e)
         {
-            DrawPercentage();
+            RemoveActualGraph();
+
+            if (GetDataGridRowsHasError(myDataGrid)==true)
+            {
+                System.Windows.MessageBox.Show("表格中数据有误！请确认。");
+            }
+            else
+            {
+                DrawPercentage();
+            }
         }
+
+        //校验DataGrid是否有误，true为有误，false为无误
+        public static bool GetDataGridRowsHasError(System.Windows.Controls.DataGrid myDataGrid)
+        {
+            bool hasError = false;
+            for (int i = 0; i < myDataGrid.Items.Count; i++)
+            {
+                DependencyObject o = myDataGrid.ItemContainerGenerator.ContainerFromIndex(i);
+
+                try
+                {
+                    hasError = Validation.GetHasError(o);
+                    if (hasError)
+                    {
+                        break;
+                    }
+                }
+                catch
+                {
+                    hasError = false;
+                }                                                    
+            }
+            return hasError;
+        }
+
 
         //白色，最小曲线
         public void DrawWhiteLightMinimum()
@@ -258,7 +298,7 @@ namespace DrawDimmingCurve
             }
         }
 
-        public void RemoveGraph()
+        public void RemoveAllGraph()
         {
             DimmingCurveChart.Children.Remove(graphWhiteLightMinimum);
             DataSourceWhiteLightMinimum = new ObservableDataSource<System.Windows.Point>();
@@ -271,7 +311,11 @@ namespace DrawDimmingCurve
 
             DimmingCurveChart.Children.Remove(graphNotWhiteLightMaximum);
             DataSourceNotWhiteLightMaximum = new ObservableDataSource<System.Windows.Point>();
+            
+        }
 
+        public void RemoveActualGraph()
+        {
             DimmingCurveChart.Children.Remove(graphPercentage);
             DataSourcePercentage = new ObservableDataSource<System.Windows.Point>();
         }
@@ -289,32 +333,48 @@ namespace DrawDimmingCurve
                 RawPWMArray[i] = (int)myDataTable.Rows[i][1];
             }
 
-            if(JudgeRawPWMArray(RawPWMArray)==true)
+            if (GetDataGridRowsHasError(myDataGrid) == true)
             {
-                ExportPWMArray = GenerateFinalPWMArray(RawPWMArray, ConfigureParameters.ArrayMaxValue);
-                ExportTXT(ExportPWMArray);
+                System.Windows.MessageBox.Show("表格中数据有误！请确认。");
             }
             else
             {
-                System.Windows.MessageBox.Show("曲线不符合递增趋势！请确认。");
+                if (JudgeRawPWMArray(RawPWMArray) == true)
+                {
+                    ExportPWMArray = GenerateFinalPWMArray(RawPWMArray, ConfigureParameters.ArrayMaxValue);
+                    ExportTXT(ExportPWMArray);
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("曲线未呈现递增趋势或出现负值！请确认。");
+                }
             }
+
+            
 
         }
 
         public bool JudgeRawPWMArray(int[] TempArray)
         {
-            for(int i=0;i<40;i++)
+            for (int i = 0; i < 41; i++)
             {
-                if(TempArray[i+1]< TempArray[i])
+                if (TempArray[i] < 0)
                 {
                     return false;
                 }
             }
 
-            return true;
-        }
+            for (int i=0;i<40;i++)
+            {                               
+                if (TempArray[i + 1] < TempArray[i])
+                {
+                    return false;
+                }
+                            
+            }
 
-        
+            return true;
+        }        
 
         public int[] GenerateFinalPWMArray(int[] RawArray,int ArraySize)
         {
@@ -371,7 +431,17 @@ namespace DrawDimmingCurve
 
         public void ExportTXT(int[] TempArray)
         {
-            string FileName = "d:\\调光曲线PWM数组" + " " + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string color = "";
+            if (ConfigureParameters.IsWhiteOrNot==1)
+            {
+                color = "白色";
+            }
+            if(ConfigureParameters.IsWhiteOrNot==2)
+            {
+                color = "非白色";
+            }
+
+            string FileName = "d:\\调光曲线PWM数组 "+ConfigureParameters.PWMMaxValue+ "(PWM最大值) " +ConfigureParameters.ArrayMaxValue + "(数组大小) " + color+ " " + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             FileStream fs = new FileStream(FileName, FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
 
@@ -400,7 +470,21 @@ namespace DrawDimmingCurve
 
             if(myIntArray[myIntArray.Length-1]!=0)
             {
-                //将数据导入DataGrid控件
+                ImportDataToDataGrid(myIntArray);
+
+                myDataGrid.IsEnabled = true;
+                DimmingCurveChart.IsEnabled = true;
+
+                GenerateCurve.IsEnabled = true;
+                ExportArray.IsEnabled = true;
+            }
+            else
+            {
+                myDataGrid.IsEnabled = false;
+                DimmingCurveChart.IsEnabled = false;
+
+                GenerateCurve.IsEnabled = false;
+                ExportArray.IsEnabled = false;
             }
 
         }
@@ -474,7 +558,7 @@ namespace DrawDimmingCurve
 
                     for (int i=0;i<41;i++)
                     {
-                        FinalArray[i] = ResultArray[numberArray[i]];
+                        FinalArray[i] = ResultArray[numberArray[i]];                        
                     }
                 }
                 else
@@ -484,7 +568,7 @@ namespace DrawDimmingCurve
             }
             else
             {
-                System.Windows.MessageBox.Show("数组大小不符！请重新配置数组大小。");
+                System.Windows.MessageBox.Show("数组大小不符！请重新配置数组大小。");               
             }
 
             return FinalArray;
@@ -523,6 +607,31 @@ namespace DrawDimmingCurve
             return numberArray;
         }
 
+        //将数据导入到DataGrid控件
+        public void ImportDataToDataGrid(int[] MyArray)
+        {                        
+            myDataTable = new System.Data.DataTable();
+
+            myDataTable.Columns.Add("Current", typeof(double));
+            myDataTable.Columns.Add("PWM", typeof(int));
+            myDataTable.Columns.Add("Percentage", typeof(double));
+
+            DataRow myDataRow;
+
+            for (int i = 0; i < 41; i++)
+            {
+                myDataRow = myDataTable.NewRow();
+                myDataRow["Current"] = CurrentArray[i];
+                myDataRow["PWM"] = MyArray[i];
+                myDataRow["Percentage"] = Math.Round((double)MyArray[i] / ConfigureParameters.PWMMaxValue * 100, 2, MidpointRounding.AwayFromZero);
+
+                myDataTable.Rows.Add(myDataRow);
+            }
+
+            myDataGrid.ItemsSource = myDataTable.DefaultView;
+
+            GenerateStandardGraph();
+        }
         #endregion
     }
 

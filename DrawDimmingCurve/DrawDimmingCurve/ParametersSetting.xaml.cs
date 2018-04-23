@@ -38,7 +38,7 @@ namespace DrawDimmingCurve
                     arrayMaxValue = Convert.ToInt32(ArraySize.Text.Trim());
                     pwmMaxValue = Convert.ToInt32(PWMMaxValue.Text.Trim());
 
-                    if (arrayMaxValue <= 1024 && arrayMaxValue >= 41)
+                    if (arrayMaxValue <= 1024 && arrayMaxValue >= 100)
                     {
                         if(pwmMaxValue >= 1)
                         {
@@ -57,7 +57,7 @@ namespace DrawDimmingCurve
                     }
                     else
                     {
-                        MessageBox.Show("数组大小输入错误！请输入数值范围为41~1024。");
+                        MessageBox.Show("数组大小输入错误！请输入数值范围为100~1024。");
                     }
 
                 }
