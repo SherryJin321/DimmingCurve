@@ -175,6 +175,7 @@ namespace DrawDimmingCurve
         public void GenerateStandardGraph()
         {
             RemoveAllGraph();
+            RemoveActualGraph();
 
             //绘制调光曲线上下限
             if (ConfigureParameters.IsWhiteOrNot == 1)
@@ -341,12 +342,14 @@ namespace DrawDimmingCurve
             {
                 if (JudgeRawPWMArray(RawPWMArray) == true)
                 {
+                    
+
                     ExportPWMArray = GenerateFinalPWMArray(RawPWMArray, ConfigureParameters.ArrayMaxValue);
                     ExportTXT(ExportPWMArray);
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show("曲线未呈现递增趋势或出现负值！请确认。");
+                    System.Windows.MessageBox.Show("曲线未呈现递增趋势或出现负值或是最大值与设定值不符！请确认。");
                 }
             }
 
@@ -373,7 +376,16 @@ namespace DrawDimmingCurve
                             
             }
 
-            return true;
+            if(TempArray[40]==ConfigureParameters.PWMMaxValue)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+            
         }        
 
         public int[] GenerateFinalPWMArray(int[] RawArray,int ArraySize)
@@ -413,13 +425,13 @@ namespace DrawDimmingCurve
 
             for(int i=0;i<40;i++)
             {
-                int k = (RawArray[i + 1] - RawArray[i]) / (countArray[i] + 1);
+                double k = (RawArray[i + 1] - RawArray[i]) / (double)(countArray[i] + 1);
 
                 if(countArray[i]!=0)
                 {
                     for (int j = 1; j < countArray[i] + 1; j++)
                     {
-                        resultArray[numberArray[i] + j] = RawArray[i] + j * k;
+                        resultArray[numberArray[i] + j] = Convert.ToInt32( RawArray[i] + j * k);
                     }
                 }
                 
